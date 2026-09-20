@@ -65,3 +65,7 @@ class Config:
         ]
         if missing:
             raise SystemExit(f"Missing required environment variables: {', '.join(missing)}")
+
+# ── Global Exports (कोर इंजन के सीधे इंपोर्ट एरर को रोकने के लिए वेरिएबल्स) ──
+ARC_API_URL = getenv("RAILWAY_YT_API_URI", "https://arcmusic.fun")
+ARC_API_KEY = getenv("RAILWAY_YT_API_KEY", "ARC5c354b8ef8b2b1ef5d9e8b")
