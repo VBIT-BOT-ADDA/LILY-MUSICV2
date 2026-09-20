@@ -27,10 +27,9 @@ class Config:
         self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/VAMPIREUPDATES")
 
         # Self-hosted YouTube API — Heroku apihub proxy (X-API-Key = ARC5c354b8ef8b2b1ef5d9e8b).
-       ARC_API_URL = getenv("RAILWAY_YT_API_URI", "https://arcmusic.fun")
-       ARC_API_KEY = getenv("RAILWAY_YT_API_KEY", "ARC5c354b8ef8b2b1ef5d9e8b")
+        self.ARC_API_URL = getenv("RAILWAY_YT_API_URI", "https://arcmusic.fun")
+        self.ARC_API_KEY = getenv("RAILWAY_YT_API_KEY", "ARC5c354b8ef8b2b1ef5d9e8b")
 
-        
         self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", "False").lower() == "true"
         self.AUTO_END: bool = getenv("AUTO_END", "False").lower() == "true"
     
