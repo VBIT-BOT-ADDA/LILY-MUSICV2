@@ -1,4 +1,3 @@
-```python
 import time
 import asyncio
 import logging
@@ -81,4 +80,3 @@ async def stop() -> None:
     await db.close()
 
     logger.info("Stopped.\n")
-```
