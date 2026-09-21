@@ -1,3 +1,4 @@
+```python
 import time
 import asyncio
 import logging
@@ -50,6 +51,9 @@ from ishu.core.telegram import Telegram
 from ishu.core.youtube import YouTube
 
 tg = Telegram()
+
+# YouTube is already initialized in youtube.py
+# Do NOT use YouTube()
 yt = YouTube
 
 # Helpers
@@ -77,3 +81,4 @@ async def stop() -> None:
     await db.close()
 
     logger.info("Stopped.\n")
+```
