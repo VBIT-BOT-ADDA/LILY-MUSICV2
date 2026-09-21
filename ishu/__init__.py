@@ -50,7 +50,7 @@ from ishu.core.telegram import Telegram
 from ishu.core.youtube import YouTube
 
 tg = Telegram()
-yt = YouTube()
+yt = YouTube
 
 # Helpers
 from ishu.helpers import Queue, Thumbnail
