@@ -229,19 +229,21 @@ class YouTubeAPI:
         if "&" in link:
             link = link.split("&")[0]
         try:
-            plist = await Playlist.get(link)
+            ytdl_opts = {
+                "quiet": True,
+                "extract_flat": True,
+                "skip_download": True,
+            }
+            with yt_dlp.YoutubeDL(ytdl_opts) as ydl:
+                info = ydl.extract_info(link, download=False)
+            entries = (info or {}).get("entries") or []
+            return [
+                item.get("id")
+                for item in entries[:limit]
+                if isinstance(item, dict) and item.get("id")
+            ]
         except Exception:
             return []
-        videos = plist.get("videos") or []
-        ids = []
-        for data in videos[:limit]:
-            if not data:
-                continue
-            vid = data.get("id")
-            if not vid:
-                continue
-            ids.append(vid)
-        return ids
  
     async def track(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
@@ -264,6 +266,50 @@ class YouTubeAPI:
         }
         return track_details, vidid
  
+    async def search_similar_candidates(self, query: str, limit: int = 10):
+        candidates = []
+        try:
+            results = VideosSearch(query, limit=limit)
+            data = await results.next()
+            for result in (data or {}).get("result", []):
+                try:
+                    duration = result.get("duration")
+                    duration_sec = int(time_to_seconds(duration)) if duration else 0
+                    candidates.append(
+                        type(
+                            "YouTubeCandidate",
+                            (),
+                            {
+                                "id": result.get("id"),
+                                "title": result.get("title"),
+                                "url": result.get("link") or self.base + result.get("id", ""),
+                                "duration": duration,
+                                "duration_sec": duration_sec,
+                                "thumbnail": (result.get("thumbnails") or [{}])[0].get("url", "").split("?")[0],
+                                "channel_name": (result.get("channel") or {}).get("name", ""),
+                                "video": False,
+                                "file_path": None,
+                            },
+                        )()
+                    )
+                except Exception:
+                    continue
+        except Exception:
+            return []
+        return candidates
+
+    async def get_related_candidates(self, video_id: str, limit: int = 10):
+        # py-yt-search does not expose YouTube's private related-video endpoint.
+        # Use a title search as a safe fallback.
+        try:
+            details = await self.details(video_id, videoid=True)
+            title = details[0] if details else ""
+            if title:
+                return await self.search_similar_candidates(title, limit=limit)
+        except Exception:
+            pass
+        return []
+
     async def formats(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -307,7 +353,7 @@ class YouTubeAPI:
     async def download(
         self,
         link: str,
-        mystic,
+        mystic=None,
         video: Union[bool, str] = None,
         videoid: Union[bool, str] = None,
         songaudio: Union[bool, str] = None,
