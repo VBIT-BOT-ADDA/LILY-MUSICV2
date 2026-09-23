@@ -40,7 +40,8 @@ RUN uv sync --no-dev
 # Copy the rest of the project
 COPY . .
 
-# Create necessary runtime directories
-RUN mkdir -p downloads cache ishu/cookies
+# FIX: Pehle check karke agar 'ishu/cookies' naam ki file exist karti hai toh use remove karega,
+# phir safely downloads, cache aur ishu/cookies folders ko create karega.
+RUN rm -rf ishu/cookies && mkdir -p downloads cache ishu/cookies
 
 CMD ["bash", "start"]
